@@ -565,10 +565,15 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
                 ret = obfs_para->deobfs_request(buf, BUF_SIZE, server->obfs);
                 if (ret == OBFS_NEED_MORE)
                     return;
-                else if (ret == OBFS_ERROR)
-                    obfs_para->disable(server->obfs);
+                else if (ret == OBFS_ERROR) {
+                    close_and_free_remote(EV_A_ remote);
+                    close_and_free_server(EV_A_ server);
+                    return;
+                }
             } else {
-                obfs_para->disable(server->obfs);
+                close_and_free_remote(EV_A_ remote);
+                close_and_free_server(EV_A_ server);
+                return;
             }
         }
 
